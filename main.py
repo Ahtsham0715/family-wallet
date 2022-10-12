@@ -6,9 +6,40 @@
 
 class Family_Wallet():
     def __init__(self):
-        self.balance=0
+        self.balance=100
         self.children_paid_amount = 0
         self.family_transaction_details = []
+        self.family_blocked_details = {}
+        self.items_data = [
+            {
+                'item_name' : 'bag',
+                'shop_name' : 'walmat'
+                },
+            {
+                'item_name' : 'sneakers',
+                'shop_name' : 'walmat'
+                },
+            {
+                'item_name' : 'mouse',
+                'shop_name' : 'walmat'
+                },
+            {
+                'item_name' : 'laptop',
+                'shop_name' : 'amazon'
+                },
+            {
+                'item_name' : 'milk',
+                'shop_name' : 'amazon'
+                },
+            {
+                'item_name' : 'chocolates',
+                'shop_name' : 'amazon'
+                },
+        ]
+        with open('blocked.txt', 'r') as f:
+            for data in f.readlines():
+                self.family_blocked_details[str(data).split(',')[0]] = str(data).split(',')[1]
+            
         self.members = {
             'Mam' : {
                 'amount_paid': 0,
@@ -17,7 +48,7 @@ class Family_Wallet():
                 'requests':{},
                 'transactions': {},
                 'notifications' : '',
-                'isblocked': False
+                'isblocked': self.family_blocked_details['Mam']
                 },
             'Dad' : {
                 'amount_paid': 0,
@@ -34,7 +65,7 @@ class Family_Wallet():
                 'amount_withdrawn': 0,
                 'daily_remaining_amount': 0,
                 'paid_times': 0,
-                'isblocked': False
+                'isblocked': self.family_blocked_details['Child1']
                 },
             'Child2' : {
                 'pending_requests':{},
@@ -43,7 +74,7 @@ class Family_Wallet():
                 'amount_withdrawn': 0,
                 'daily_remaining_amount': 0,
                 'paid_times': 0,
-                'isblocked': False
+                'isblocked': self.family_blocked_details['Child2']
                 },
             'Child3' : {
                 'amount_paid': 0,
@@ -52,7 +83,7 @@ class Family_Wallet():
                 'amount_withdrawn': 0,
                 'daily_remaining_amount': 0,
                 'paid_times': 0,
-                'isblocked': False
+                'isblocked': self.family_blocked_details['Child3']
                 },
             'Child4' : {
                 'amount_paid': 0,
@@ -61,7 +92,7 @@ class Family_Wallet():
                 'amount_withdrawn': 0,
                 'daily_remaining_amount': 0,
                 'paid_times': 0,
-                'isblocked': False
+                'isblocked': self.family_blocked_details['Child4']
                 },
             'Child5' : {
                 'amount_paid': 0,
@@ -70,7 +101,7 @@ class Family_Wallet():
                 'amount_withdrawn': 0,
                 'daily_remaining_amount': 0,
                 'paid_times': 0,
-                'isblocked': False
+                'isblocked': self.family_blocked_details['Child5']
                 },
             'Child6' : {
                 'amount_paid': 0,
@@ -79,7 +110,7 @@ class Family_Wallet():
                 'amount_withdrawn': 0,
                 'daily_remaining_amount': 0,
                 'paid_times': 0,
-                'isblocked': False
+                'isblocked': self.family_blocked_details['Child6']
                 },
             'Child7' : {
                 'amount_paid': 0,
@@ -88,7 +119,7 @@ class Family_Wallet():
                 'amount_withdrawn': 0,
                 'daily_remaining_amount': 0,
                 'paid_times': 0,
-                'isblocked': False
+                'isblocked': self.family_blocked_details['Child7']
                 },
             'Child8' : {
                 'amount_paid': 0,
@@ -97,25 +128,34 @@ class Family_Wallet():
                 'amount_withdrawn': 0,
                 'daily_remaining_amount': 0,
                 'paid_times': 0,
-                'isblocked': False
+                'isblocked': self.family_blocked_details['Child8']
                 },
         }
     
     def check_transactions(self):
-        mydetails = ''
-        for i in range(self.family_transaction_details):
-            mydetails += f'{i}- {self.family_transaction_details[i]}\n\n'
-        print(mydetails)
+        # mydetails = ''
+        # for i in range(self.family_transaction_details):
+        #     mydetails += f'{i}- {self.family_transaction_details[i]}\n\n'
+        # print(mydetails)
+        print('\n\nFamily Transactions details\n\n')
+        with open('family_transanctions.txt', 'r') as f:
+            for data in f.readlines():
+                print(data)
     
     
     def Deposit(self, amount, name):
         self.balance += amount
+        with open('family_transanctions.txt', 'a') as f:
+            f.write(f'{name} has deposited {amount}\n')
         self.family_transaction_details.append(f'{name} has deposited {amount}')
         
         
     def Withdraw(self, amount, name):
         self.balance -= amount
+        with open('family_transanctions.txt', 'a') as f:
+            f.write(f'{name} has withdrawn {amount}\n')
         self.family_transaction_details.append(f'{name} has withdrawn {amount}')    
+        
     def Pay(self, amount, name, transaction_details):
         if self.balance != 0:
             if name == 'Mam' or name == 'Dad':
@@ -123,14 +163,18 @@ class Family_Wallet():
                 self.members[name]['amount_paid'] += amount
                 print(f'{amount}$ has been paid\nyour remaining wallet balance is {self.balance}')
                 self.family_transaction_details.append(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]}')
+                with open('family_transanctions.txt', 'a') as f:
+                    f.write(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]}\n')
             else:
-                if self.members['name']['paid_times'] == 0:
+                if self.members[name]['paid_times'] == 0:
                     if amount <= 50:
                         self.balance -= amount
                         self.children_paid_amount += amount
                         self.members[name]['amount_paid'] += amount
                         print(f'{amount}$ has been paid\nyour daily remaining balance is {self.members[name]["daily_remaining_amount"]}')
                         self.family_transaction_details.append(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]}')
+                        with open('family_transanctions.txt', 'a') as f:
+                            f.write(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]}\n')
                     else:
                         self.kid_input = input('you need permission from parents to pay more than 50$\nPress 1 to request to Mam or press any key to exit... ')
                         if self.kid_input == '1':
@@ -164,37 +208,47 @@ class Family_Wallet():
 
 
 def main():
+    family_info = {}
+    with open('blocked.txt', 'r') as f:
+        # data = f.readlines()
+        for data in f.readlines():
+            family_info[str(data).split(',')[0]] = str(data).split(',')[1]
+        print(family_info)
     family_wallet = Family_Wallet()
     print('Welcome to Family Wallet...!!!\n\n')
     name = input('Enter your name... ')
     if name in family_wallet.members.keys() and name != 'Dad' and name != 'Mam':
-        if family_wallet.members[name]['isblocked']:
+        if family_info[name] == 'True\n':
             print('Sorry You are blocked by the dad.')
         else:
+            print('Items List\n\n')
+            print('Item Name\t\tShop Name\n\n')
+            for item in family_wallet.items_data:
+                print(f'{item["item_name"]}\t\t{item["shop_name"]}')
             response = input('Press 1 to pay or press 2 to exit... ')
             if response == '1':
+               
                 try:
                     amount = int(input('Enter amount you want to pay... '))
-                    item_name = input('Enter item name you are going to purchase... ')
-                    shop_name = input('Enter shop name from where you are going to purchase this item... ')
-                    
-                    family_wallet.Pay(amount=amount, name=name, transaction_details={
-                        'item_name' : item_name,
-                        'shop_name' : shop_name,
-                    })
+                   
                 except:
                     amount = int(input('Invalid amount! Again Enter the amount... '))
-                    item_name = input('Enter item name you are going to purchase... ')
-                    shop_name = input('Enter shop name from where you are going to purchase this item... ')
-                    family_wallet.Pay(amount=amount, name=name, transaction_details={
+                item_name = input('Enter item name you are going to purchase... ')
+                shop_name = input('Enter shop name from where you are going to purchase this item... ')
+                    
+                family_wallet.Pay(amount=amount, name=name, transaction_details={
                         'item_name' : item_name,
                         'shop_name' : shop_name,
                     })
-    elif name in family_wallet.members.keys():
+    elif str(name) in family_wallet.members.keys():
         if name == 'Mam':
-            if family_wallet.members[name]['isblocked']:
+            if family_info[name] == 'True\n':
                 print('Sorry You are blocked by the dad.')
             else:
+                print('Items List\n\n')
+                print('Item Name\t\tShop Name\n\n')
+                for item in family_wallet.items_data:
+                    print(f'{item["item_name"]}\t\t{item["shop_name"]}')
                 if family_wallet.balance < 100:
                     print('\n\nYour wallet balance is low please deposit some amount.\n\n')
                 # print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance')
@@ -202,23 +256,21 @@ def main():
                 print(res)
                 print(type(res))
                 if res == '1':
+                    print('Items List\n\n')
+                    print('Item Name\t\tShop Name\n\n')
+                    for item in family_wallet.items_data:
+                        print(f'{item["item_name"]}\n\n{item["shop_name"]}')
                     try:
                         amount = int(input('Enter amount you want to pay... '))
-                        item_name = input('Enter item name you are going to purchase... ')
-                        shop_name = input('Enter shop name from where you are going to purchase this item... ')
-                        
-                        family_wallet.Pay(amount=amount, name=name, transaction_details={
-                            'item_name' : item_name,
-                            'shop_name' : shop_name,
-                        })
+                       
                     except:
                         amount = int(input('Invalid amount! Again Enter the amount... '))
-                        item_name = input('Enter item name you are going to purchase... ')
-                        shop_name = input('Enter shop name from where you are going to purchase this item... ')
-                        family_wallet.Pay(amount=amount, name=name, transaction_details={
-                            'item_name' : item_name,
-                            'shop_name' : shop_name,
-                        })
+                    item_name = input('Enter item name you are going to purchase... ')
+                    shop_name = input('Enter shop name from where you are going to purchase this item... ')
+                    family_wallet.Pay(amount=amount, name=name, transaction_details={
+                        'item_name' : item_name,
+                        'shop_name' : shop_name,
+                    })
                 elif res == '2':
                     amount = int(input('Enter amount you want to deposit... '))
                     family_wallet.Deposit(amount=amount, name=name)
@@ -239,23 +291,21 @@ def main():
             print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance\nPress 7 to block a family member.... ')
             res = input()
             if res == '1':
+                print('Items List\n\n')
+                print('Item Name\t\tShop Name\n\n')
+                for item in family_wallet.items_data:
+                    print(f'{item["item_name"]}\n\n{item["shop_name"]}')
                 try:
                     amount = int(input('Enter amount you want to pay... '))
-                    item_name = input('Enter item name you are going to purchase... ')
-                    shop_name = input('Enter shop name from where you are going to purchase this item... ')
-                    
-                    family_wallet.Pay(amount=amount, name=name, transaction_details={
-                        'item_name' : item_name,
-                        'shop_name' : shop_name,
-                    })
+                   
                 except:
                     amount = int(input('Invalid amount! Again Enter the amount... '))
-                    item_name = input('Enter item name you are going to purchase... ')
-                    shop_name = input('Enter shop name from where you are going to purchase this item... ')
-                    family_wallet.Pay(amount=amount, name=name, transaction_details={
-                        'item_name' : item_name,
-                        'shop_name' : shop_name,
-                    })
+                item_name = input('Enter item name you are going to purchase... ')
+                shop_name = input('Enter shop name from where you are going to purchase this item... ')
+                family_wallet.Pay(amount=amount, name=name, transaction_details={
+                    'item_name' : item_name,
+                    'shop_name' : shop_name,
+                })
             elif res == '2':
                 amount = int(input('Enter amount you want to deposit... '))
                 family_wallet.Deposit(amount=amount, name=name)
@@ -271,7 +321,9 @@ def main():
             elif res == '7':
                 member_name = input('Enter the name of family member you want to block... ')
                 if family_wallet.members[member_name] in family_wallet.members.keys():
-                    family_wallet.members[member_name]['isblocked'] = True
+                    # family_wallet.members[member_name]['isblocked'] = True
+                    with open('blocked.txt', 'a') as f:
+                        f.write(f'{member_name},True\n')
                     print(f'{member_name} has been blocked')
                 else:
                     print('family member not found')
