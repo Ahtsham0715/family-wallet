@@ -171,8 +171,8 @@ def main():
         if family_wallet.members[name]['isblocked']:
             print('Sorry You are blocked by the dad.')
         else:
-            reponse = input('Press 1 to pay or press 2 to exit... ')
-            if reponse == '1':
+            response = input('Press 1 to pay or press 2 to exit... ')
+            if response == '1':
                 try:
                     amount = int(input('Enter amount you want to pay... '))
                     item_name = input('Enter item name you are going to purchase... ')
@@ -197,9 +197,11 @@ def main():
             else:
                 if family_wallet.balance < 100:
                     print('\n\nYour wallet balance is low please deposit some amount.\n\n')
-                print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance')
-                response = input()
-                if reponse == '1':
+                # print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance')
+                res = input('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance... ')
+                print(res)
+                print(type(res))
+                if res == '1':
                     try:
                         amount = int(input('Enter amount you want to pay... '))
                         item_name = input('Enter item name you are going to purchase... ')
@@ -217,17 +219,17 @@ def main():
                             'item_name' : item_name,
                             'shop_name' : shop_name,
                         })
-                elif response == '2':
+                elif res == '2':
                     amount = int(input('Enter amount you want to deposit... '))
                     family_wallet.Deposit(amount=amount, name=name)
-                elif response == '3':
+                elif res == '3':
                     amount = int(input('Enter amount you want to withdraw... '))
                     family_wallet.Withdraw(amount=amount, name=name)
-                elif response == '4':
+                elif res == '4':
                     print(family_wallet.members[name]['requests'].values())
-                elif response == '5':
+                elif res == '5':
                     family_wallet.check_transactions()
-                elif response == '6':
+                elif res == '6':
                     print(f'your remaining balance is {family_wallet.balance}$.')
                 else:
                     print('Invalid Choice')
@@ -235,8 +237,8 @@ def main():
             if family_wallet.balance < 100:
                 print('\n\nYour wallet balance is low please deposit some amount.\n\n')
             print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance\nPress 7 to block a family member.... ')
-            response = input()
-            if reponse == '1':
+            res = input()
+            if res == '1':
                 try:
                     amount = int(input('Enter amount you want to pay... '))
                     item_name = input('Enter item name you are going to purchase... ')
@@ -254,19 +256,19 @@ def main():
                         'item_name' : item_name,
                         'shop_name' : shop_name,
                     })
-            elif response == '2':
+            elif res == '2':
                 amount = int(input('Enter amount you want to deposit... '))
                 family_wallet.Deposit(amount=amount, name=name)
-            elif response == '3':
+            elif res == '3':
                 amount = int(input('Enter amount you want to withdraw... '))
                 family_wallet.Withdraw(amount=amount, name=name)
-            elif response == '4':
+            elif res == '4':
                 print(family_wallet.members[name]['requests'].values())
-            elif response == '5':
+            elif res == '5':
                 family_wallet.check_transactions()
-            elif response == '6':
+            elif res == '6':
                 print(f'your remaining balance is {family_wallet.balance}$.')
-            elif reponse == '7':
+            elif res == '7':
                 member_name = input('Enter the name of family member you want to block... ')
                 if family_wallet.members[member_name] in family_wallet.members.keys():
                     family_wallet.members[member_name]['isblocked'] = True
@@ -279,3 +281,5 @@ def main():
             print('Invalid Input')    
     else:
         print('Family Member not found!!')     
+        
+main()
