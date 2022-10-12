@@ -106,7 +106,7 @@ class Family_Wallet():
     def Withdraw(self, amount, name):
         self.balance -= amount
     
-    def Pay(self, amount, name):
+    def Pay(self, amount, name, transaction_details):
         if self.balance == 0:
             if name == 'Mam' or name == 'Dad':
                 self.balance -= amount
@@ -148,3 +148,37 @@ class Family_Wallet():
                         self.members['Mam']['requests'][name]['extra_usage'] = f'{name} has requested to deposit amount as account balance is not sufficient'
                 else:
                     pass
+
+
+def main():
+    family_wallet = Family_Wallet()
+    print('Welcome to Family Wallet...!!!\n\n')
+    member = input('Press 1 if you are parent or Press 2 if you are a child... ')
+    if member == '2':
+        name = input('Enter your name... ')
+        reponse = input('Press 1 to pay or press 2 to exit... ')
+        if reponse == '1':
+            try:
+                amount = int(input('Enter amount you want to pay... '))
+                item_name = input('Enter item name you are going to purchase... ')
+                shop_name = input('Enter shop name from where you are going to purchase this item... ')
+                family_wallet.Pay(amount=amount, name=name, transaction_details={
+                    'item_name' : item_name,
+                    'shop_name' : shop_name,
+                })
+            except:
+                amount = int(input('Invalid amount! Again Enter the amount... '))
+                item_name = input('Enter item name you are going to purchase... ')
+                shop_name = input('Enter shop name from where you are going to purchase this item... ')
+                family_wallet.Pay(amount=amount, name=name, transaction_details={
+                    'item_name' : item_name,
+                    'shop_name' : shop_name,
+                })
+    elif member == '1':
+        name = input('Enter your name... ')
+        if name == 'Mam':
+            print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions')
+        if name == 'Dad':
+            print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to block a family member.... ')
+        else:
+            print('Invalid Input')         
