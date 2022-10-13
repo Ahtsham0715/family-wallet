@@ -1,6 +1,9 @@
 
 
 
+import datetime
+
+
 class Family_Wallet():
     def __init__(self):
         with open('bank_balance.txt', 'r') as f:
@@ -154,7 +157,7 @@ class Family_Wallet():
             
             with open('family_transanctions.txt', 'a') as f:
                 f.write(f'{name} has deposited {amount}\n')
-            self.family_transaction_details.append(f'{name} has deposited {amount}')
+            self.family_transaction_details.append(f'{name} has deposited {amount} at {datetime.datetime.now()}')
             print(f'\n\n{amount}$ has been deposited from your bank account.\nYour new wallet balance is {self.balance}\n')
         else:
             print('Unable to Deposit this amount as your bank balance is low.')
@@ -165,8 +168,9 @@ class Family_Wallet():
         with open('wallet_balance.txt', 'w') as f:
             f.write(str(self.balance))
         with open('family_transanctions.txt', 'a') as f:
-            f.write(f'{name} has withdrawn {amount}\n')
-        self.family_transaction_details.append(f'{name} has withdrawn {amount}')    
+            f.write(f'{name} has withdrawn {amount} at {datetime.datetime.now()}\n')
+        self.family_transaction_details.append(f'{name} has withdrawn {amount}')  
+        print(f'{amount} has been withdrawn successfully')  
         
     def Pay(self, amount, name, transaction_details):
         if self.balance != 0:
@@ -178,7 +182,7 @@ class Family_Wallet():
                 print(f'{amount}$ has been paid\nyour remaining wallet balance is {self.balance}')
                 self.family_transaction_details.append(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]}')
                 with open('family_transanctions.txt', 'a') as f:
-                    f.write(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]}\n')
+                    f.write(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]} at {datetime.datetime.now()}\n')
             else:
                 if self.members[name]['paid_times'] == 0:
                     if amount <= 50:
@@ -190,7 +194,7 @@ class Family_Wallet():
                         print(f'{amount}$ has been paid\nyour daily remaining balance is {self.members[name]["daily_remaining_amount"]}')
                         self.family_transaction_details.append(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]}')
                         with open('family_transanctions.txt', 'a') as f:
-                            f.write(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]}\n')
+                            f.write(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]} at {datetime.datetime.now()}\n')
                     else:
                         self.kid_input = input('you need permission from parents to pay more than 50$\nPress 1 to request to Mam or press any key to exit... ')
                         if self.kid_input == '1':
@@ -199,8 +203,10 @@ class Family_Wallet():
                 else:
                     self.kid_input = input("You can't use wallet twice\nSend request to parents to use wallet again\nPress 1 to send request or press any key to exit... ")   
                     if self.kid_input == '1':
-                        self.members['Mam']['requests'][name]['extra_usage'] = f'{name} has requested to use wallet second time\nPress 1 to accpet or Press 2 to reject... '
-                        self.members['Dad']['requests'][name]['extra_usage'] = f'{name} has requested to use wallet second time\nPress 1 to accpet or Press 2 to reject... '
+                        with open('requests.txt', 'a') as f:
+                            f.write(f'{name} has requested to use wallet second time\n')
+                        # self.members['Mam']['requests'][name]['extra_usage'] = f'{name} has requested to use wallet second time\nPress 1 to accpet or Press 2 to reject... '
+                        # self.members['Dad']['requests'][name]['extra_usage'] = f'{name} has requested to use wallet second time\nPress 1 to accpet or Press 2 to reject... '
                     else:
                         pass        
         
@@ -268,7 +274,7 @@ def main():
                 for item in family_wallet.items_data:
                     print(f'{item["item_name"]}\t\t{item["shop_name"]}')
                 if family_wallet.balance < 100:
-                    print('\n\nYour wallet balance is low please deposit some amount.\n\n')
+                    print('\n\n*** Your wallet balance is low please deposit some amount!!! ***\n\n')
                 # print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance')
                 res = input('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance... ')
                 print(res)
@@ -297,7 +303,11 @@ def main():
                     amount = int(input('Enter amount you want to withdraw... '))
                     family_wallet.Withdraw(amount=amount, name=name)
                 elif res == '4':
-                    print(family_wallet.members[name]['requests'].values())
+                    with open('requests.txt', 'r') as f:
+                        requests = f.readlines()
+                    for request in requests:
+                        print(request)
+                    # print(family_wallet.members[name]['requests'].values())
                 elif res == '5':
                     family_wallet.check_transactions()
                 elif res == '6':
@@ -306,7 +316,7 @@ def main():
                     print('Invalid Choice')
         elif name == 'Dad':
             if family_wallet.balance < 100:
-                print('\n\nYour wallet balance is low please deposit some amount.\n\n')
+                print('\n\n*** Your wallet balance is low please deposit some amount!!! ***\n\n')
             print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance\nPress 7 to block a family member\nPress 8 to unblock a family person.... ')
             res = input()
             if res == '1':

@@ -1,3 +1,2 @@
-Child2 has paid 40 to purchase milk from amazon
-Mam has deposited 500
-Mam has deposited 100
+
+Mam has withdrawn 250 at 2022-10-13 18:59:45.653643
