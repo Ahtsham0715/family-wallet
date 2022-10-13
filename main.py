@@ -1,12 +1,12 @@
 
 
 
-
-
-
 class Family_Wallet():
     def __init__(self):
-        self.balance=100
+        with open('bank_balance.txt', 'r') as f:
+            self.bank_balance = int(f.read())
+        with open('wallet_balance.txt', 'r') as f:
+            self.balance= int(f.read())
         self.children_paid_amount = 0
         self.family_transaction_details = []
         self.family_blocked_details = {}
@@ -141,17 +141,29 @@ class Family_Wallet():
         with open('family_transanctions.txt', 'r') as f:
             for data in f.readlines():
                 print(data)
-    
+
     
     def Deposit(self, amount, name):
-        self.balance += amount
-        with open('family_transanctions.txt', 'a') as f:
-            f.write(f'{name} has deposited {amount}\n')
-        self.family_transaction_details.append(f'{name} has deposited {amount}')
+        if int(self.bank_balance) >= int(amount):
+            self.balance += amount
+            with open('wallet_balance.txt', 'w') as f:
+                f.write(str(self.balance))
+                
+            with open('bank_balance.txt', 'w') as f:
+                f.write(str(int(self.bank_balance) - int(amount)))
+            
+            with open('family_transanctions.txt', 'a') as f:
+                f.write(f'{name} has deposited {amount}\n')
+            self.family_transaction_details.append(f'{name} has deposited {amount}')
+            print(f'\n\n{amount}$ has been deposited from your bank account.\nYour new wallet balance is {self.balance}\n')
+        else:
+            print('Unable to Deposit this amount as your bank balance is low.')
         
         
     def Withdraw(self, amount, name):
         self.balance -= amount
+        with open('wallet_balance.txt', 'w') as f:
+            f.write(str(self.balance))
         with open('family_transanctions.txt', 'a') as f:
             f.write(f'{name} has withdrawn {amount}\n')
         self.family_transaction_details.append(f'{name} has withdrawn {amount}')    
@@ -160,6 +172,8 @@ class Family_Wallet():
         if self.balance != 0:
             if name == 'Mam' or name == 'Dad':
                 self.balance -= amount
+                with open('wallet_balance.txt', 'w') as f:
+                    f.write(str(self.balance))
                 self.members[name]['amount_paid'] += amount
                 print(f'{amount}$ has been paid\nyour remaining wallet balance is {self.balance}')
                 self.family_transaction_details.append(f'{name} has paid {amount} to purchase {transaction_details["item_name"]} from {transaction_details["shop_name"]}')
@@ -169,6 +183,8 @@ class Family_Wallet():
                 if self.members[name]['paid_times'] == 0:
                     if amount <= 50:
                         self.balance -= amount
+                        with open('wallet_balance.txt', 'w') as f:
+                            f.write(str(self.balance))
                         self.children_paid_amount += amount
                         self.members[name]['amount_paid'] += amount
                         print(f'{amount}$ has been paid\nyour daily remaining balance is {self.members[name]["daily_remaining_amount"]}')
@@ -195,6 +211,8 @@ class Family_Wallet():
                     try:
                         self.amount = int(input('Enter amount you want to deposit... '))
                         self.balance += self.amount
+                        with open('wallet_balance.txt', 'w') as f:
+                            f.write(str(self.balance))
                     except:
                         print('invalid amount')
                 else:
@@ -254,7 +272,7 @@ def main():
                 # print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance')
                 res = input('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance... ')
                 print(res)
-                print(type(res))
+                # print(type(res))
                 if res == '1':
                     print('Items List\n\n')
                     print('Item Name\t\tShop Name\n\n')
@@ -272,6 +290,7 @@ def main():
                         'shop_name' : shop_name,
                     })
                 elif res == '2':
+                    print(f'your bank balance is {family_wallet.bank_balance}$')
                     amount = int(input('Enter amount you want to deposit... '))
                     family_wallet.Deposit(amount=amount, name=name)
                 elif res == '3':
@@ -288,7 +307,7 @@ def main():
         elif name == 'Dad':
             if family_wallet.balance < 100:
                 print('\n\nYour wallet balance is low please deposit some amount.\n\n')
-            print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance\nPress 7 to block a family member.... ')
+            print('Press 1 to Pay\nPress 2 to deposit money\nPress 3 to withdraw money\nPress 4 to check requests\nPress 5 to check family transactions\nPress 6 to check balance\nPress 7 to block a family member\nPress 8 to unblock a family person.... ')
             res = input()
             if res == '1':
                 print('Items List\n\n')
@@ -307,6 +326,7 @@ def main():
                     'shop_name' : shop_name,
                 })
             elif res == '2':
+                print(f'your bank balance is {family_wallet.bank_balance}$')
                 amount = int(input('Enter amount you want to deposit... '))
                 family_wallet.Deposit(amount=amount, name=name)
             elif res == '3':
@@ -319,12 +339,36 @@ def main():
             elif res == '6':
                 print(f'your remaining balance is {family_wallet.balance}$.')
             elif res == '7':
+                print('\n\n*** UnBlocked Persons List ***\n\n')
+                for key,value in family_info.items():
+                    if value == 'False\n':
+                        print(f'{key}\n')
                 member_name = input('Enter the name of family member you want to block... ')
-                if family_wallet.members[member_name] in family_wallet.members.keys():
+                if member_name in family_wallet.members.keys():
                     # family_wallet.members[member_name]['isblocked'] = True
-                    with open('blocked.txt', 'a') as f:
-                        f.write(f'{member_name},True\n')
+                    family_info[member_name] = 'True\n'
+                    with open('blocked.txt', 'w') as f:
+                        for key, value in family_info.items():
+                            f.write(f'{key},{value}')
                     print(f'{member_name} has been blocked')
+                else:
+                    print('family member not found')
+            elif res == '8':
+                print('\n\n*** Blocked Persons List ***\n\n')
+                for key,value in family_info.items():
+                    if value == 'True\n':
+                        print(f'{key}\n')
+                member_name = input('Enter the name of family member you want to unblock... ')
+                if member_name in family_wallet.members.keys():
+                    # family_wallet.members[member_name]['isblocked'] = True
+                    if family_info[member_name] == 'True\n':
+                        family_info[member_name] = 'False\n'
+                        with open('blocked.txt', 'w') as f:
+                            for key, value in family_info.items():
+                                f.write(f'{key},{value}')
+                        print(f'{member_name} has been unblocked')
+                    else:
+                        print(f'\n*** {member_name} not found in blocked list.')
                 else:
                     print('family member not found')
             else:
