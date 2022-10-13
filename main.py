@@ -305,8 +305,11 @@ def main():
                 elif res == '4':
                     with open('requests.txt', 'r') as f:
                         requests = f.readlines()
-                    for request in requests:
-                        print(request)
+                    if len(requests) == 0:
+                        print('No request available.')
+                    else:
+                        for request in requests:
+                            print(request)
                     # print(family_wallet.members[name]['requests'].values())
                 elif res == '5':
                     family_wallet.check_transactions()
@@ -343,7 +346,14 @@ def main():
                 amount = int(input('Enter amount you want to withdraw... '))
                 family_wallet.Withdraw(amount=amount, name=name)
             elif res == '4':
-                print(family_wallet.members[name]['requests'].values())
+                with open('requests.txt', 'r') as f:
+                    requests = f.readlines()
+                    if len(requests) == 0:
+                        print('No request available.')
+                    else:
+                        for request in requests:
+                            print(request)
+                # print(family_wallet.members[name]['requests'].values())
             elif res == '5':
                 family_wallet.check_transactions()
             elif res == '6':
